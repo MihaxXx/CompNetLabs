@@ -1,0 +1,85 @@
+<html>
+<head>
+<meta charset="utf-8">
+<title>
+Пример использования форм
+</title>
+</head>
+<body>
+<h1>Заполните поля формы для отправки на сервер <font color="red"> методом GET </font></h1>
+<h2> Отправляемые данные будут закодированы: urlencode </h2>
+
+<form  method="GET" action="cgi_get.cgi">  
+Пароль <INPUT SIZE=10 TYPE=password NAME=password> не рекомендуется отправлять методом GET!!!
+<br> <br>
+Выберите день недели &nbsp <SELECT NAME=Day>
+<option>Monday</option>
+<option>Tuesday</option>
+<option>Wednesday</option>
+<option>Thursday</option>
+<option>Friday</option>
+<option>Saturday</option>
+<option>Sunday</option>
+</SELECT>
+<br> <br>
+<INPUT TYPE=submit VALUE="OK - GET">
+</FORM>
+
+
+<hr size=3>
+<!--  ===============================================================================================  -->
+
+<h1>Заполните поля формы для отправки на сервер <font color=red> методом POST </font></h1>
+<h2> Отправляемые данные будут закодированы: urlencode </h2>
+
+<FORM ENCTYPE="application/x-www-form-urlencoded" method="POST" action="cgi_post.cgi"> 
+<!-- application/x-www-form-urlencoded  - кодирование по умолчанию, его можно не указывать -->
+
+<TEXTAREA NAME=BigText COLS=25 ROWS=5>
+Text Text
+</TEXTAREA>
+
+<br> <br>
+Пол:
+<INPUT NAME="pol" TYPE=radio VALUE=m CHECKED>Мужской
+<INPUT NAME="pol" TYPE=radio VALUE=f>Женский 
+
+<br> <br>
+
+<!--<INPUT TYPE=file NAME="myfile" VALUE="здесь впишите имя файла" SIZE=25>  
+
+<br> <br>-->
+
+<INPUT TYPE=submit VALUE="OK - POST">
+
+</FORM>
+
+<hr size=3>
+<!--  ===============================================================================================  -->
+
+<h1>Заполните поля формы для отправки на сервер <font color=red> методом POST </font></h1>
+<h2> <font color="magenta"> Отправляемые данные не будут закодированы </font> </h2>
+
+<FORM ENCTYPE="multipart/form-data" method="POST" action="cgi_post.cgi">  <!-- ENCTYPE=multipart/form-data  - для отправки файлов -->
+
+<TEXTAREA NAME=BigText COLS=25 ROWS=5>
+Text Text
+</TEXTAREA>
+
+<br> <br>
+Пол:
+<INPUT NAME="pol" TYPE=radio VALUE=m CHECKED>Мужской
+<INPUT NAME="pol" TYPE=radio VALUE=f>Женский 
+
+<br> <br>
+
+<!--<INPUT TYPE=file NAME="myfile" VALUE="здесь впишите имя файла" SIZE=25>  
+
+<br> <br>-->
+
+<INPUT TYPE=submit VALUE="OK - POST">
+
+</FORM>
+
+</body>
+</html>
