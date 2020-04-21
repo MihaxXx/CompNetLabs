@@ -11,7 +11,9 @@ class Client : IDisposable
 {
     NetworkStream s;
     TcpClient client;
-
+    string name;
+    int state = 0;//0 - command, 1 - transmit, 2 - recive
+    int len;
 
     public Client(TcpClient c)
     {
@@ -22,6 +24,58 @@ class Client : IDisposable
     public void Dispose()
     {
         s.Dispose();
+    }
+
+    void ProcessMsg(string msg)
+    {
+        Console.Write($"msg from {name}:{msg}");
+        switch (state)
+        {
+            case 0:
+                var words = msg.TrimEnd('\r', '\n').Split(' ');
+                switch (words[0])
+                {
+                    case "set_login":
+                        if (name == null && words.Length > 1)
+                            name = words[1];
+                        break;
+                    case "send":
+                        if (words.Length == 3 && Program.clients.Any(c => c.name == words[1]) && int.TryParse(words[2], out len) && len > 0)
+                        {
+                            state = 1;
+                            Program.msgsInTransfer.Add(name, words[1]);
+                        }
+                        else
+                            len = 0;
+                        break;
+                    case "recive":
+                        state = 2;
+                        break;
+                }
+                break;
+            case 1:
+                Client cl = null;
+                try
+                {
+                    len--;
+                    cl = Program.clients.Last(c => c.name == Program.msgsInTransfer[name]);
+                    while (!cl.s.CanWrite) { }
+                    cl.s.Write(Encoding.Default.GetBytes(msg));
+                }
+                catch (InvalidOperationException)
+                { }
+                finally
+                {
+                    if (len == 0)
+                    {
+                        state = 0;
+                        Program.msgsInTransfer.Remove(name);
+                    }
+                }
+                break;
+            case 2:
+                break;
+        }
     }
 
     async Task<byte[]> ReadFromStreamAsync(int nbytes)
@@ -38,10 +92,11 @@ class Client : IDisposable
         while (client.Connected)
         {
             //var actionBuffer = await ReadFromStreamAsync(2);
-            byte[] msg = new byte[1024];     // готовим место для принятия сообщения
+            byte[] msg = new byte[256];     // готовим место для принятия сообщения
             int count = await s.ReadAsync(msg, 0, msg.Length);   // читаем сообщение от клиента
-            Console.Write(Encoding.Default.GetString(msg, 0, count)); // выводим на экран полученное сообщение в виде строки
+            ProcessMsg(Encoding.Default.GetString(msg, 0, count)); // выводим на экран полученное сообщение в виде строки
         }
+        Program.clients.Remove(this);
     }
     async Task<string> ReadWithTimeout(int n) // (*)
     {

@@ -25,14 +25,18 @@ class Program
     }
 
     static HashSet<Task> activeClientTasks = new HashSet<Task>();
+    public static Dictionary<string, string> msgsInTransfer = new Dictionary<string, string>();
+    public static List<Client> clients = new List<Client>();
 
     static async Task processClient(TcpClient c)
     {
         using (var client = new Client(c))
         {
+            clients.Add(client);
             Task task = client.ProcessAsync();
             activeClientTasks.Add(task);
             await task;
+            clients.Remove(client);
         }
     }
 }
