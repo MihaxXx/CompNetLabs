@@ -12,7 +12,7 @@ class Client : IDisposable
     NetworkStream s;
     TcpClient client;
     string name;
-    int state = 0;//0 - command, 1 - transmit, 2 - recive
+    int state = 0;// 0 - command, 1 - transmit, 2 - receive
     int len;
 
     public Client(TcpClient c)
@@ -37,19 +37,31 @@ class Client : IDisposable
                 {
                     case "set_login":
                         if (name == null && words.Length > 1)
+                        {
                             name = words[1];
+                            if(s.CanWrite)
+                                s.Write(Encoding.Default.GetBytes($"Login set to {name}"));
+                        }
                         break;
                     case "send":
                         if (words.Length == 3 && Program.clients.Any(c => c.name == words[1]) && int.TryParse(words[2], out len) && len > 0)
                         {
                             state = 1;
                             Program.msgsInTransfer.Add(name, words[1]);
+                            if (s.CanWrite)
+                                s.Write(Encoding.Default.GetBytes($"User {name} state switched to {state}"));
                         }
                         else
                             len = 0;
+                            if (s.CanWrite)
+                                s.Write(Encoding.Default.GetBytes($"User {words[1]} not found"));
                         break;
-                    case "recive":
+                    case "receive":
                         state = 2;
+                        break;
+                    default:
+                        if (s.CanWrite)
+                            s.Write(Encoding.Default.GetBytes($"Unknown command"));
                         break;
                 }
                 break;
@@ -70,10 +82,14 @@ class Client : IDisposable
                     {
                         state = 0;
                         Program.msgsInTransfer.Remove(name);
+                        if (s.CanWrite)
+                            s.Write(Encoding.Default.GetBytes($"User {name} state switched to {state}"));
                     }
                 }
                 break;
             case 2:
+                Console.WriteLine("Not implemented.");
+                state = 0;
                 break;
         }
     }
