@@ -19,9 +19,12 @@ def process_msg(msg, wsc)
     words = msg.strip.split(' ')
     case words[0]
     when 'set_login'
-      if client.name.empty? && words.length > 1
+      if client.name.empty? && words.length > 1 &&
+         !(@clients.any? { |c| c.name == words[1] })
         client.name = words[1]
         wsc.send "Login set to #{client.name}"
+      else
+        wsc.send "Login not set"
       end
     when 'send'
       if words.length == 3 && @clients.any? { |c| c.name == words[1] } &&
@@ -41,11 +44,12 @@ def process_msg(msg, wsc)
     client.len -= 1
     cl = @clients.filter { |c| c.name == @msgs_in_transfer[client.name] }.last
     unless cl.nil?
-      while msg > 256
-        cl.wss.send msg[0..99]
-        msg = msg[100..msg.length]
+      while msg.length > 256
+        cl.wss.send msg[0..255]
+        msg = msg[256..msg.length]
         sleep 1
       end
+      cl.wss.send msg
     end
     if client.len.zero?
       client.state = 0
