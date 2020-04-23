@@ -24,7 +24,7 @@ def process_msg(msg, wsc)
         client.name = words[1]
         wsc.send "Login set to #{client.name}"
       else
-        wsc.send "Login not set"
+        wsc.send 'Login not set'
       end
     when 'send'
       if words.length == 3 && @clients.any? { |c| c.name == words[1] } &&
@@ -60,10 +60,6 @@ def process_msg(msg, wsc)
     puts 'Not implemented.'
     client.state = 0
   end
-
-  #answer = (eval words[1] + words[0] + words[2]).to_s + "\r\n"
-  #wsc.send answer
-  #puts 'Answer: ' + answer
 end
 
 @clients = []
