@@ -40,7 +40,13 @@ def process_msg(msg, wsc)
   when 1
     client.len -= 1
     cl = @clients.filter { |c| c.name == @msgs_in_transfer[client.name] }.last
-    cl.wss.send msg unless cl.nil?
+    unless cl.nil?
+      while msg > 256
+        cl.wss.send msg[0..99]
+        msg = msg[100..msg.length]
+        sleep 1
+      end
+    end
     if client.len.zero?
       client.state = 0
       @msgs_in_transfer.delete client.name
