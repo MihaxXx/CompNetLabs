@@ -4,7 +4,7 @@
   "description": "",
   "main": "server.js",
   "dependencies": {
-    "engine.io": "^3.2.0",
+    "engine.io": "^3.6.1",
     "eureca.io": "^0.8.2",
     "express": "^4.16.4"
   },
